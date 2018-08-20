@@ -1,0 +1,17 @@
+eight_points_guzzle:
+    clients:
+        api_shopping:
+            base_url: "%env(SHOPPING_IKOM_BASE_URL)%"
+            options:
+                headers:
+                    User-Agent: "Adwords-Enhanced/1.0"
+                    Accept: "application/json"
+            plugin: ~
+        api_adwords:
+            base_url: "%env(ADWORDS_BASE_URL)%"
+            options:
+                headers:
+                    Accept: "application/json"
+                    Content-Type: "application/json"
+                    X-HMAC-KEY: "%env(HMAC_KEY)%"
+            plugin: ~
