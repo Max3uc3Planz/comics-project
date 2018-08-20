@@ -1,0 +1,103 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo_data_comics_n_friends:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - mongo
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  mysql:
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_DATABASE: comics_n_friends_dev
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+      MYSQL_ROOT_PASSWORD: user
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysql --user=user --password=user -e "SHOW TABLES" comics_n_friends_dev
+      interval: 5s
+      timeout: 1s
+      retries: 10
+    networks:
+      - mysql
+    volumes:
+      - 'mysql_data_comics_n_friends:/var/lib/mysql'
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  ms_marvel_core:
+    build:
+      context: ./marvel-core-microservice
+    environment:
+      SYMFONY_ENV: dev
+      HMAC_KEY: 'dev'
+    labels:
+      com.project_type: api-platform
+    volumes:
+      - './marvel-core-microservice/app:/var/www/html/src:cached'
+    networks:
+      - mysql
+      - mongo
+      - web
+    depends_on:
+      - mysql
+      - mongo
+      - traefik
+    labels:
+      - "traefik.backend=marvel-core"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host: marvel-core.comics-n-friends.local;"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.enable=true"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  traefik:
+      image: traefik
+      command: --web --web.address=:8686 --docker --docker.domain=comics-n-friends.local --docker.watch --logLevel=DEBUG --entryPoints='Name:http Address::80' --defaultEntryPoints='http' --accessLogsFile='log/access.log'
+      networks:
+        - web
+      ports:
+        - "80:80"
+        - "8686:8686"
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /dev/null:/traefik.toml
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "200k"
+          max-file: "10"
+networks:
+  mysql: null
+  mongo: null
+  marvel_core:
+    driver: bridge
+  web:
+    external:
+      name: traefik_default
+
+volumes:
+  mysql_data_comics_n_friends:
+    driver: local
+  mongo_data_comics_n_friends:
+    driver: local

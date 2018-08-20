@@ -1,6 +1,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    locale: 'en'
 
 services:
     # default configuration for services in *this* file
@@ -22,29 +23,6 @@ services:
     App\Controller\:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
-
-    App\Request\GoogleShoppingRequester:
-        arguments:
-            $client: "@eight_points_guzzle.client.api_shopping"
-
-    App\Adwords\Shopping\Provider\ExtractorProvider:
-        configurator: 'App\Adwords\Shopping\Provider\ExtractorProviderConfigurator:configure'
-
-    App\Request\AdwordsSegmentationRequester:
-        arguments:
-            $client: "@eight_points_guzzle.client.api_adwords"
-
-    App\Request\AdwordsAdgroupCampaignRequester:
-        arguments:
-            $client: "@eight_points_guzzle.client.api_adwords"
-
-    App\Adwords\Alert\AlertSynchronizer:
-        arguments:
-            $database: "@mongo.connection"
-
-    App\Controller\GetAlertsDataController:
-        arguments:
-            $database: "@mongo.connection"
 
     App\EventListener\JWTCreatedListener:
         tags:

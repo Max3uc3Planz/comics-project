@@ -1,0 +1,9 @@
+###> symfony/framework-bundle ###
+.env
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+###> lexik/jwt-authentication-bundle ###
+%CONFIG_DIR%/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

@@ -24,7 +24,6 @@ RUN apk del libressl-dev \
     && apk del openssl-dev \
     && apk add libressl-dev
 
-RUN pecl install mongodb
 RUN set -xeo pipefail \
     && version=$(php -r "echo PHP_MAJOR_VERSION, PHP_MINOR_VERSION;") \
     && curl -sSL -D - -A "Docker" -o /tmp/blackfire-probe.tar.gz https://blackfire.io/api/v1/releases/probe/php/alpine/amd64/${version} \
